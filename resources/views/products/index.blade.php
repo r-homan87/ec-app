@@ -26,6 +26,7 @@
                             <th>価格</th>
                             <th>在庫</th>
                             <th>画像</th>
+                            <th>操作</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -38,6 +39,16 @@
                                 @if ($product->image_path)
                                 <img src="{{ asset($product->image_path) }}" alt="{{ $product->name }}" class="w-12 h-12 object-cover rounded">
                                 @endif
+                            </td>
+                            <td class="py-2 px-4">
+                                <form action="{{ route('cart.store') }}" method="POST" class="flex items-center space-x-2">
+                                    @csrf
+                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                    <input type="number" name="quantity" value="1" min="1" class="w-16 border rounded px-2 py-1">
+                                    <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                                        カートに追加
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         @endforeach

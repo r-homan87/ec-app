@@ -11,6 +11,16 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    public function index()
+    {
+        $orders = Order::with('orderItems.product')
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->get();
+
+        return view('orders.index', compact('orders'));
+    }
+
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -25,7 +35,6 @@ class OrderController extends Controller
         DB::beginTransaction();
 
         try {
-            // まずは空の注文作成（合計金額はあとで更新）
             $order = Order::create([
                 'user_id' => $user->id,
                 'total_price' => 0,
