@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\GenreController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -30,9 +31,16 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/orders/complete', [OrderController::class, 'complete'])->name('orders.complete');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 });
+
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
+
+Route::resource('genres', GenreController::class)->middleware(['auth']);
 
 require __DIR__ . '/auth.php';

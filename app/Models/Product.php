@@ -15,5 +15,11 @@ class Product extends Model
         'price',
         'stock',
         'image_path',
+        'genre_id',
     ];
+
+    public function genre()
+    {
+        return $this->belongsTo(Genre::class);
+    }
 }

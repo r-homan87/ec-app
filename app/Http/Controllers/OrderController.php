@@ -8,9 +8,12 @@ use App\Models\CartItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class OrderController extends Controller
 {
+    use AuthorizesRequests;
+
     public function index()
     {
         $orders = Order::with('orderItems.product')
@@ -57,22 +60,26 @@ class OrderController extends Controller
 
             // カートを空にする
             CartItem::where('user_id', $user->id)->delete();
-
             DB::commit();
-
-            return redirect()->route('orders.show', $order)->with('success', '注文が完了しました');
+            return redirect()->route('orders.complete', $order->id)->with('success', '注文が完了しました');
         } catch (\Exception $e) {
             DB::rollBack();
+            dd($e->getMessage());
             return redirect()->back()->with('error', '注文に失敗しました');
         }
     }
 
     public function show(Order $order)
     {
-        $this->authorize('view', $order); // 任意：注文の所有者チェック
+        $this->authorize('view', $order);
 
         $order->load('orderItems.product');
 
         return view('orders.show', compact('order'));
+    }
+
+    public function complete()
+    {
+        return view('orders.complete');
     }
 }

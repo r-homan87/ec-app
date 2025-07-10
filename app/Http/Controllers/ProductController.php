@@ -32,7 +32,7 @@ class ProductController extends Controller
     {
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('public/products');
+            $imagePath = $request->file('image')->store('products', 'public');
         }
 
         Product::create([
@@ -40,7 +40,7 @@ class ProductController extends Controller
             'description' => $request->description,
             'price' => $request->price,
             'stock' => $request->stock,
-            'image_path' => $imagePath ? str_replace('public/', 'storage/', $imagePath) : null,
+            'image_path' => $imagePath,
         ]);
 
         return redirect()->route('products.index')->with('success', '商品を登録しました');
