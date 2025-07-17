@@ -21,13 +21,28 @@
                 @csrf
 
                 <div class="mb-4">
+                    <label class="block font-medium text-sm text-gray-700">商品画像</label>
+                    <input type="file" name="image" class="form-input rounded-md shadow-sm mt-1 block w-full">
+                </div>
+
+                <div class="mb-4">
                     <label class="block font-medium text-sm text-gray-700">商品名</label>
                     <input type="text" name="name" class="form-input rounded-md shadow-sm mt-1 block w-full" required>
                 </div>
 
                 <div class="mb-4">
-                    <label class="block font-medium text-sm text-gray-700">説明</label>
+                    <label class="block font-medium text-sm text-gray-700">商品説明</label>
                     <textarea name="description" class="form-textarea rounded-md shadow-sm mt-1 block w-full"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block font-medium text-sm text-gray-700">ジャンル</label>
+                    <select name="genre_id" class="form-select rounded-md shadow-sm mt-1 block w-full">
+                        <option value="">選択してください</option>
+                        @foreach ($genres as $genre)
+                        <option value="{{ $genre->id }}">{{ $genre->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div class="mb-4">
@@ -41,8 +56,11 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="block font-medium text-sm text-gray-700">画像</label>
-                    <input type="file" name="image" class="form-input rounded-md shadow-sm mt-1 block w-full">
+                    <label class="block font-medium text-sm text-gray-700">販売ステータス</label>
+                    <select name="status" class="form-select rounded-md shadow-sm mt-1 block w-full" required>
+                        <option value="available">販売中</option>
+                        <option value="unavailable">販売停止中</option>
+                    </select>
                 </div>
 
                 <div class="mt-6">

@@ -24,8 +24,11 @@
                     <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
                         注文履歴
                     </x-nav-link>
-                    <x-nav-link :href="route('genres.index')" :active="request()->routeIs('orders.*')">
+                    <x-nav-link :href="route('genres.index')" :active="request()->routeIs('genres.*')">
                         ジャンル一覧
+                    </x-nav-link>
+                    <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                        会員一覧
                     </x-nav-link>
                     <x-nav-link :href="route('register')" :active="request()->routeIs('register')">
                         新規登録
@@ -97,8 +100,11 @@
             <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
                 注文履歴
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('genres.index')" :active="request()->routeIs('orders.*')">
+            <x-responsive-nav-link :href="route('genres.index')" :active="request()->routeIs('genres.*')">
                 ジャンル一覧
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                会員一覧
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('register')" :active="request()->routeIs('register')">
                 新規登録

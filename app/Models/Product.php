@@ -16,6 +16,7 @@ class Product extends Model
         'stock',
         'image_path',
         'genre_id',
+        'status',
     ];
 
     public function genre()
