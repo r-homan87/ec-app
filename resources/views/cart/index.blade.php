@@ -65,18 +65,15 @@
 
             @if (!$cartItems->isEmpty())
             <div class="mt-6">
-                <form action="{{ route('orders.store') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                        注文する
-                    </button>
-                </form>
+                <a href="{{ route('orders.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    情報入力に進む
+                </a>
             </div>
             @endif
 
             <div class="mt-6">
                 <a href="{{ route('products.index') }}" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
-                    商品一覧へ戻る
+                    買い物を続ける
                 </a>
             </div>
         </div>

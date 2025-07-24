@@ -7,6 +7,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -19,6 +20,10 @@ Route::get('/dashboard', function () {
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
     Route::get('/users/{user}/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('users.orders.index');
+});
+
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
 });
 
 Route::middleware('auth')->group(function () {
@@ -37,9 +42,11 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/orders/complete', [OrderController::class, 'complete'])->name('orders.complete');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
+    Route::post('/orders/confirm', [OrderController::class, 'confirm'])->name('orders.confirm');
+    Route::get('/orders/complete', [OrderController::class, 'complete'])->name('orders.complete');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 });
 

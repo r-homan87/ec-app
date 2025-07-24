@@ -23,6 +23,7 @@ class RegisterUserRequest extends FormRequest
             'address' => ['required', 'string', 'max:255'],
             'phone_number' => ['required', 'digits_between:10,11'],
             'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+            'status' => ['required', 'boolean'],
         ];
     }
 }

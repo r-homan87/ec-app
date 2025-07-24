@@ -21,6 +21,7 @@ class User extends Authenticatable
         'address',
         'phone_number',
         'password',
+        'status',
     ];
 
     protected $hidden = [
@@ -34,5 +35,15 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getStatusLabelAttribute()
+    {
+        return $this->status ? '有効' : '退会';
+    }
+
+    public function shippingAddresses()
+    {
+        return $this->hasMany(ShippingAddress::class);
     }
 }

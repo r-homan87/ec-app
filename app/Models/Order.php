@@ -21,4 +21,18 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    public function getStatusLabelAttribute()
+    {
+        return match ($this->status) {
+            'pending' => '未発送',
+            'shipped' => '発送済み',
+            default => '不明',
+        };
+    }
+
+    public function shippingAddress()
+    {
+        return $this->belongsTo(ShippingAddress::class);
+    }
 }

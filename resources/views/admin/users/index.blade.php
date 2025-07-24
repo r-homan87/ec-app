@@ -20,17 +20,17 @@
                     @foreach ($users as $user)
                     <tr>
                         <td class="border px-4 py-2">{{ $user->id }}</td>
-                        <td>
+                        <td class="border px-4 py-2">
                             <a href="{{ route('admin.users.show', $user->id) }}" class="text-blue-600 hover:underline">
                                 {{ $user->last_name }}{{ $user->first_name }}
                             </a>
                         </td>
                         <td class="border px-4 py-2">{{ $user->email }}</td>
                         <td class="border px-4 py-2">
-                            @if ($user->email_verified_at)
+                            @if ($user->status)
                             <span class="text-green-600">有効</span>
                             @else
-                            <span class="text-red-600">未確認</span>
+                            <span class="text-red-600">退会</span>
                             @endif
                         </td>
                     </tr>

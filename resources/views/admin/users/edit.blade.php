@@ -59,8 +59,15 @@
                     <input type="email" name="email" value="{{ old('email', $user->email) }}" class="form-input rounded-md shadow-sm mt-1 block w-full" required>
                 </div>
 
+                <div class="mb-4">
+                    <label for="status">ステータス</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="1" {{ old('status', $user->status) == 1 ? 'selected' : '' }}>有効</option>
+                        <option value="0" {{ old('status', $user->status) == 0 ? 'selected' : '' }}>退会</option>
+                    </select>
+                </div>
+
                 <div class="flex items-center justify-between mt-6">
-                    <a href="{{ route('admin.users.index') }}" class="text-sm text-blue-600 hover:underline">一覧に戻る</a>
                     <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded">
                         更新する
                     </button>

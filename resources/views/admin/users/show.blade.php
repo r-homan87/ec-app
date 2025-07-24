@@ -43,7 +43,13 @@
 
                 <div>
                     <dt class="font-bold">会員ステータス：</dt>
-                    <dd>{{ $user->email_verified_at ? '有効' : '未確認' }}</dd>
+                    <dd>
+                        @if ($user->status)
+                        <span class="text-green-600 font-semibold">有効</span>
+                        @else
+                        <span class="text-red-600 font-semibold">退会</span>
+                        @endif
+                    </dd>
                 </div>
             </dl>
 

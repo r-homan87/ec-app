@@ -14,4 +14,11 @@ class OrderController extends Controller
         $orders = Order::where('user_id', $user->id)->with('orderItems')->latest()->get();
         return view('admin.orders.index', compact('user', 'orders'));
     }
+
+    public function show(Order $order)
+    {
+        $order->load('user', 'shippingAddress', 'orderItems.product');
+
+        return view('admin.orders.show', compact('order'));
+    }
 }

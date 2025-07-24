@@ -13,17 +13,25 @@
             <table class="w-full table-auto">
                 <thead class="bg-gray-100">
                     <tr>
-                        <th class="px-4 py-2 text-left">注文ID</th>
-                        <th class="px-4 py-2 text-left">注文日</th>
-                        <th class="px-4 py-2 text-left">合計金額</th>
+                        <th class="px-4 py-2 text-left">購入日時</th>
+                        <th class="px-4 py-2 text-left">注文個数</th>
+                        <th class="px-4 py-2 text-left">注文ステータス</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($orders as $order)
                     <tr class="border-t">
-                        <td class="px-4 py-2">{{ $order->id }}</td>
-                        <td class="px-4 py-2">{{ $order->created_at->format('Y-m-d H:i') }}</td>
-                        <td class="px-4 py-2">¥{{ number_format($order->orderItems->sum(fn($item) => $item->price * $item->quantity)) }}</td>
+                        <td class="px-4 py-2 text-blue-600 underline">
+                            <a href="{{ route('admin.orders.show', $order->id) }}">
+                                {{ $order->created_at->format('Y-m-d H:i') }}
+                            </a>
+                        </td>
+                        <td class="px-4 py-2">
+                            {{ $order->orderItems->sum('quantity') }}
+                        </td>
+                        <td class="px-4 py-2">
+                            {{ $order->status_label }} {{-- 例: '未発送', '発送済み'など --}}
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>
