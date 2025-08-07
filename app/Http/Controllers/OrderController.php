@@ -7,6 +7,7 @@ use App\Models\OrderItem;
 use App\Models\CartItem;
 use App\Models\ShippingAddress;
 use Illuminate\Http\Request;
+use App\Http\Requests\OrderRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -33,43 +34,62 @@ class OrderController extends Controller
         return view('orders.create', compact('shippingAddresses'));
     }
 
-    public function confirm(Request $request)
+    public function confirm(OrderRequest $request)
     {
         $user = Auth::user();
-        $shippingOption = $request->input('shipping_option');
 
-        $data = [
-            'payment_method' => $request->input('payment_method'),
-            'shipping_option' => $shippingOption,
-        ];
+        $validated = $request->validated();
 
-        if ($shippingOption === 'new') {
-            $data['new_recipient_name'] = $request->input('new_recipient_name');
-            $data['new_postal_code'] = $request->input('new_postal_code');
-            $data['new_address'] = $request->input('new_address');
-        } elseif ($shippingOption === 'registered') {
-            $registeredId = $request->input('registered_address_id');
-            $data['registered_address_id'] = $registeredId;
+        $shippingData = [];
 
-            $selectedAddress = ShippingAddress::where('user_id', $user->id)
-                ->where('id', $registeredId)
-                ->first();
-
-            if ($selectedAddress) {
-                $data['registered_recipient_name'] = $selectedAddress->recipient_name;
-                $data['registered_postal_code'] = $selectedAddress->postal_code;
-                $data['registered_address'] = $selectedAddress->address;
-            }
+        if ($validated['shipping_option'] === 'myself') {
+            $shippingData = [
+                'postal_code' => $user->postal_code,
+                'address' => $user->address,
+                'recipient_name' => $user->name,
+            ];
+        } elseif ($validated['shipping_option'] === 'registered') {
+            $address = ShippingAddress::where('user_id', $user->id)
+                ->where('id', $validated['registered_address_id'])
+                ->firstOrFail();
+            $shippingData = [
+                'postal_code' => $address->postal_code,
+                'address' => $address->address,
+                'recipient_name' => $address->recipient_name,
+            ];
+        } elseif ($validated['shipping_option'] === 'new') {
+            $newAddress = ShippingAddress::create([
+                'user_id' => $user->id,
+                'postal_code' => $validated['new_postal_code'],
+                'address' => $validated['new_address'],
+                'recipient_name' => $validated['new_recipient_name'],
+            ]);
+            $shippingData = [
+                'postal_code' => $newAddress->postal_code,
+                'address' => $newAddress->address,
+                'recipient_name' => $newAddress->recipient_name,
+            ];
         }
 
-        $cartItems = CartItem::with('product')->where('user_id', $user->id)->get();
+        $cartItems = CartItem::where('user_id', $user->id)->get();
+
+        $data = [
+            'payment_method' => $validated['payment_method'],
+            'shipping_option' => $validated['shipping_option'],
+            'postal_code' => $shippingData['postal_code'] ?? '',
+            'address' => $shippingData['address'] ?? '',
+            'recipient_name' => $shippingData['recipient_name'] ?? '',
+        ];
 
         return view('orders.confirm', [
             'data' => $data,
-            'user' => $user,
             'cartItems' => $cartItems,
+            'user' => $user,
+            'shippingAddresses' => $user->shippingAddresses ?? collect(),
         ]);
     }
+
+
 
     public function store(Request $request)
     {

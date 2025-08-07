@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold text-gray-800">会員編集</h2>
+        <h2 class="text-xl font-semibold text-gray-800">会員情報編集</h2>
     </x-slot>
 
     <div class="py-8">
