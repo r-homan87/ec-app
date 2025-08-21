@@ -17,8 +17,8 @@ class RegisterUserRequest extends FormRequest
         return [
             'last_name' => ['required', 'string', 'max:255'],
             'first_name' => ['required', 'string', 'max:255'],
-            'last_name_kana' => ['required', 'string', 'max:255'],
-            'first_name_kana' => ['required', 'string', 'max:255'],
+            'last_name_kana' => ['required', 'string', 'max:255', 'regex:/^[ァ-ヶー]+$/u'],
+            'first_name_kana' => ['required', 'string', 'max:255', 'regex:/^[ァ-ヶー]+$/u'],
             'email' => [
                 'required',
                 'string',
@@ -32,6 +32,22 @@ class RegisterUserRequest extends FormRequest
             'phone_number' => ['required', 'digits_between:10,11'],
             'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
             'status' => ['boolean'],
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'last_name' => '姓',
+            'first_name' => '名',
+            'last_name_kana' => 'セイ',
+            'first_name_kana' => 'メイ',
+            'email' => 'メールアドレス',
+            'postal_code' => '郵便番号',
+            'address' => '住所',
+            'phone_number' => '電話番号',
+            'password' => 'パスワード',
+            'status' => 'ステータス',
         ];
     }
 }

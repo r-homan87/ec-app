@@ -25,7 +25,7 @@
             @if ($product->image_path)
             <div class="mb-4">
                 <strong>画像：</strong><br>
-                <img src="{{ asset($product->image_path) }}" alt="{{ $product->name }}" class="w-64 h-auto rounded">
+                <img src="{{ Storage::url($product->image_path) }}" alt="{{ $product->name }}" class="w-64 h-auto rounded">
             </div>
             @endif
 
@@ -35,14 +35,16 @@
 
                 <div class="mb-3">
                     <label for="quantity">数量：</label>
-                    <input type="number" name="quantity" id="quantity" value="1" min="1" class="form-control" style="width: 80px;">
+                    <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ $product->stock }}" class="form-control" style="width: 80px;">
                 </div>
 
                 <button type="submit" class="btn btn-primary">カートに追加</button>
             </form>
 
             <div class="mt-6">
+                @if(auth()->check() && auth()->user()->isAdmin())
                 <a href="{{ route('products.edit', $product) }}" class="btn btn-primary">編集</a>
+                @endif
                 <a href="{{ route('products.index') }}" class="btn btn-secondary">一覧に戻る</a>
             </div>
         </div>

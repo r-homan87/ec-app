@@ -40,4 +40,13 @@ class OrderRequest extends FormRequest
             'new_postal_code.regex' => '郵便番号はハイフンなしの7桁で入力してください。',
         ];
     }
+
+    public function attributes(): array
+    {
+        return [
+            'new_postal_code' => '郵便番号',
+            'new_address' => '住所',
+            'new_recipient_name' => '宛名',
+        ];
+    }
 }

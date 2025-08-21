@@ -89,12 +89,9 @@ class OrderController extends Controller
         ]);
     }
 
-
-
     public function store(Request $request)
     {
         $user = Auth::user();
-
         $cartItems = CartItem::where('user_id', $user->id)->get();
 
         if ($cartItems->isEmpty()) {
@@ -104,21 +101,60 @@ class OrderController extends Controller
         DB::beginTransaction();
 
         try {
+            // 配送先情報のセット
+            if ($request->shipping_option === 'myself') {
+                $shipping_postal_code = $user->postal_code;
+                $shipping_address = $user->address;
+                $shipping_name = $user->last_name . $user->first_name;
+            } elseif ($request->shipping_option === 'registered') {
+                $shipping_postal_code = $request->postal_code;
+                $shipping_address = $request->address;
+                $shipping_name = $request->recipient_name;
+            } elseif ($request->shipping_option === 'new') {
+                $shipping_postal_code = $request->postal_code;
+                $shipping_address = $request->address;
+                $shipping_name = $request->recipient_name;
+            } else {
+                throw new \Exception('配送先が選択されていません');
+            }
+
+            // 注文作成
             $order = Order::create([
                 'user_id' => $user->id,
+                'shipping_postal_code' => $shipping_postal_code,
+                'shipping_address' => $shipping_address,
+                'shipping_name' => $shipping_name,
+                'payment_method' => $request->payment_method,
                 'total_price' => 0,
             ]);
 
             $total = 0;
 
             foreach ($cartItems as $item) {
-                $subtotal = $item->product->price * $item->quantity;
+                $product = $item->product;
+
+                // 在庫が足りるかチェック
+                if ($product->stock < $item->quantity) {
+                    throw new \Exception("商品「{$product->name}」の在庫が不足しています");
+                }
+
+                // 在庫数を減らす
+                $product->decrement('stock', $item->quantity);
+
+                // 在庫が0になったら販売停止にする
+                if ($product->stock - $item->quantity <= 0) {
+                    $product->status = 'unavailable';
+                    $product->stock = 0; // 念のためマイナスにならないように
+                    $product->save();
+                }
+
+                $subtotal = $product->price * $item->quantity;
                 $total += $subtotal;
 
                 $order->orderItems()->create([
                     'product_id' => $item->product_id,
                     'quantity' => $item->quantity,
-                    'price' => $item->product->price,
+                    'price' => $product->price,
                 ]);
             }
 
@@ -126,12 +162,13 @@ class OrderController extends Controller
 
             // カートを空にする
             CartItem::where('user_id', $user->id)->delete();
+
             DB::commit();
+
             return redirect()->route('orders.complete', $order->id)->with('success', '注文が完了しました');
         } catch (\Exception $e) {
             DB::rollBack();
-            dd($e->getMessage());
-            return redirect()->back()->with('error', '注文に失敗しました');
+            return redirect()->back()->with('error', '注文に失敗しました: ' . $e->getMessage());
         }
     }
 

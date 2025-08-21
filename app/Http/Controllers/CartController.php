@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\CartItem;
+use App\Models\Product;
 use App\Http\Requests\CartRequest;
+use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
@@ -25,13 +27,27 @@ class CartController extends Controller
         $productId = $request->input('product_id');
         $quantity = $request->input('quantity');
 
-        // すでにあるなら数量加算
+        $product = Product::findOrFail($productId);
+
+        // 在庫チェック
+        if ($quantity > $product->stock) {
+            return redirect()->back()->with('error', '在庫数を超える数量は追加できません。');
+        }
+
+        // すでにカートに入っているか確認
         $cartItem = CartItem::where('user_id', $userId)
             ->where('product_id', $productId)
             ->first();
 
         if ($cartItem) {
-            $cartItem->quantity += $quantity;
+            $newQuantity = $cartItem->quantity + $quantity;
+
+            // 合計数量が在庫を超えないようにする
+            if ($newQuantity > $product->stock) {
+                return redirect()->back()->with('error', '在庫数を超える数量は追加できません。');
+            }
+
+            $cartItem->quantity = $newQuantity;
             $cartItem->save();
         } else {
             CartItem::create([
@@ -52,7 +68,7 @@ class CartController extends Controller
         }
 
         $request->validate([
-            'quantity' => 'required|integer|min:1',
+            'quantity' => 'required|integer|min:1|max:' . $cartItem->product->stock,
         ]);
 
         $cartItem->quantity = $request->input('quantity');

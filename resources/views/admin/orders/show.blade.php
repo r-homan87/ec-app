@@ -10,8 +10,8 @@
             <h3 class="font-bold mb-2">購入者情報</h3>
             <p>氏名：{{ $order->user->last_name }} {{ $order->user->first_name }}</p>
             <p>注文日：{{ $order->created_at->format('Y-m-d H:i') }}</p>
-            <p>配送先：{{ $order->shippingAddress->postal_code }} {{ $order->shippingAddress->address }}</p>
-            <p>支払方法：{{ $order->payment_method }}</p>
+            <p>配送先：{{ $order->shipping_postal_code }} {{ $order->shipping_address }}</p>
+            <p>支払方法：{{ $order->payment_method === 'credit_card' ? 'クレジットカード' : ($order->payment_method === 'bank_transfer' ? '銀行振込' : 'その他') }}</p>
         </div>
 
         {{-- 注文ステータス更新フォーム --}}
@@ -66,11 +66,17 @@
             </tbody>
         </table>
 
+        @php
+        $shippingFee = 800;
+        $subtotal = $order->orderItems->sum(fn($item) => $item->price * $item->quantity);
+        $total = $subtotal + $shippingFee;
+        @endphp
+
         {{-- 金額情報 --}}
         <div class="text-right space-y-2">
-            <p>商品合計：¥{{ number_format($order->orderItems->sum(fn($item) => $item->price * $item->quantity)) }}</p>
-            <p>送料：¥{{ number_format($order->shipping_fee) }}</p>
-            <p class="font-bold">請求金額合計：¥{{ number_format($order->total_amount) }}</p>
+            <p>商品合計：¥{{ number_format($subtotal) }}</p>
+            <p>送料：¥800</p>
+            <p class="font-bold">請求金額合計：¥{{ number_format($total) }}</p>
         </div>
 
     </div>

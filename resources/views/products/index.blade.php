@@ -9,13 +9,21 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             <div class="mb-4">
+                @if(auth()->check() && auth()->user()->isAdmin())
                 <a href="{{ route('products.create') }}" class="btn btn-primary">
                     新規商品登録
                 </a>
+                @endif
             </div>
 
+            {{-- 成功メッセージ --}}
             @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+
+            {{-- エラーメッセージ --}}
+            @if (session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
 
             <div class="overflow-x-auto bg-white shadow rounded-lg p-4">
@@ -26,13 +34,19 @@
                             <th>価格</th>
                             <th>在庫</th>
                             <th>画像</th>
+                            @if(auth()->check() && auth()->user()->isAdmin())
+                            <th>ステータス</th>
+                            @else
                             <th>操作</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($products as $product)
                         <tr>
-                            <td class="py-2 px-4"><a href="{{ route('products.show', $product) }}">{{ $product->name }}</a></td>
+                            <td class="py-2 px-4">
+                                <a href="{{ route('products.show', $product) }}">{{ $product->name }}</a>
+                            </td>
                             <td class="py-2 px-4">¥{{ number_format($product->price) }}</td>
                             <td class="py-2 px-4">{{ $product->stock }}</td>
                             <td class="py-2 px-4">
@@ -40,6 +54,18 @@
                                 <img src="{{ Storage::url($product->image_path) }}" alt="{{ $product->name }}" class="w-12 h-12 object-cover rounded">
                                 @endif
                             </td>
+
+                            @if(auth()->check() && auth()->user()->isAdmin())
+                            <td class="py-2 px-4">
+                                @if($product->status === 'available')
+                                販売中
+                                @elseif($product->status === 'unavailable')
+                                販売停止中
+                                @else
+                                不明
+                                @endif
+                            </td>
+                            @else
                             <td class="py-2 px-4">
                                 <form action="{{ route('cart.store') }}" method="POST" class="flex items-center space-x-2">
                                     @csrf
@@ -50,10 +76,16 @@
                                     </button>
                                 </form>
                             </td>
+                            @endif
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
+
+                {{-- ページネーションリンク --}}
+                <div class="mt-4">
+                    {{ $products->links() }}
+                </div>
             </div>
         </div>
     </div>

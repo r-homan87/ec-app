@@ -11,34 +11,53 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex items-center">
                     <x-nav-link :href="route('about')" :active="request()->routeIs('about')">
                         About
                     </x-nav-link>
                     <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
                         商品一覧
                     </x-nav-link>
+
+                    @auth
                     <x-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">
                         カート
                     </x-nav-link>
                     <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
                         注文履歴
                     </x-nav-link>
-                    <x-nav-link :href="route('genres.index')" :active="request()->routeIs('genres.*')">
-                        ジャンル一覧
-                    </x-nav-link>
+
+                    @if(auth()->user()->isAdmin())
                     <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
                         会員一覧
                     </x-nav-link>
+                    <x-nav-link :href="route('genres.index')" :active="request()->routeIs('genres.*')">
+                        ジャンル一覧
+                    </x-nav-link>
+                    @endif
+
+                    <x-nav-link :href="route('mypage.index')" :active="request()->routeIs('mypage')">
+                        マイページ
+                    </x-nav-link>
+
+                    <!-- ログアウト -->
+                    <form method="POST" action="{{ route('logout') }}" class="inline-flex items-center h-full">
+                        @csrf
+                        <x-nav-link href="{{ route('logout') }}"
+                            onclick="event.preventDefault(); this.closest('form').submit();"
+                            :active="false">
+                            ログアウト
+                        </x-nav-link>
+                    </form>
+
+                    @else
                     <x-nav-link :href="route('register')" :active="request()->routeIs('register')">
                         新規登録
                     </x-nav-link>
                     <x-nav-link :href="route('login')" :active="request()->routeIs('login')">
                         ログイン
                     </x-nav-link>
-                    <x-nav-link :href="route('mypage.index')" :active="request()->routeIs('mypage')">
-                        マイページ
-                    </x-nav-link>
+                    @endauth
                 </div>
             </div>
         </div>
@@ -53,27 +72,46 @@
             <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
                 商品一覧
             </x-responsive-nav-link>
+
+            @auth
             <x-responsive-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">
                 カート
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
                 注文履歴
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('genres.index')" :active="request()->routeIs('genres.*')">
-                ジャンル一覧
-            </x-responsive-nav-link>
+
+            @if(auth()->user()->isAdmin())
             <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
                 会員一覧
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('genres.index')" :active="request()->routeIs('genres.*')">
+                ジャンル一覧
+            </x-responsive-nav-link>
+            @endif
+
+            <x-responsive-nav-link :href="route('mypage.index')" :active="request()->routeIs('mypage')">
+                マイページ
+            </x-responsive-nav-link>
+
+            <!-- ログアウト -->
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <x-responsive-nav-link href="{{ route('logout') }}"
+                    onclick="event.preventDefault(); this.closest('form').submit();"
+                    class="flex items-center">
+                    ログアウト
+                </x-responsive-nav-link>
+            </form>
+
+            @else
             <x-responsive-nav-link :href="route('register')" :active="request()->routeIs('register')">
                 新規登録
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('login')" :active="request()->routeIs('login')">
                 ログイン
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('mypage.index')" :active="request()->routeIs('mypage')">
-                マイページ
-            </x-responsive-nav-link>
+            @endauth
         </div>
     </div>
 </nav>

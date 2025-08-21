@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Models\User;
 use App\Models\ShippingAddress;
 use App\Http\Requests\ShippingAddressRequest;
 
@@ -15,6 +16,20 @@ class ShippingAddressController extends Controller
         $shippingAddresses = $user->shippingAddresses;
 
         return view('shipping_addresses.index', compact('shippingAddresses'));
+    }
+
+    public function store(ShippingAddressRequest $request)
+    {
+        $user = Auth::user();
+
+        ShippingAddress::create([
+            'user_id' => $user->id,
+            'postal_code' => $request->postal_code,
+            'address' => $request->address,
+            'recipient_name' => $request->recipient_name,
+        ]);
+
+        return redirect()->route('shipping_addresses.index')->with('success', '配送先を登録しました。');
     }
 
     public function edit($id)

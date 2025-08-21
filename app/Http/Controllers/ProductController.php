@@ -3,16 +3,29 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
 use App\Models\Product;
 use App\Models\Genre;
 use App\Http\Requests\ProductRequest;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
 
     public function index()
     {
-        $products = Product::all();
+        if (auth()->check() && auth()->user()->isAdmin()) {
+            // 管理者は全て表示
+            $products = Product::orderBy('created_at', 'desc')->paginate(8);
+        } else {
+            // ユーザーは販売中かつ在庫ありのみ表示
+            $products = Product::where('status', 'available')
+                ->where('stock', '>', 0)
+                ->orderBy('created_at', 'desc')
+                ->paginate(8);
+        }
+
         return view('products.index', compact('products'));
     }
 
@@ -55,12 +68,40 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
-        $product->update($request->all());
+        $data = $request->all();
+
+        // 画像がアップロードされていた場合
+        if ($request->hasFile('image')) {
+            // 既存画像を削除
+            if ($product->image_path && Storage::disk('public')->exists($product->image_path)) {
+                Storage::disk('public')->delete($product->image_path);
+            }
+
+            // 新しい画像を保存
+            $imagePath = $request->file('image')->store('products', 'public');
+            $data['image_path'] = $imagePath;
+        } else {
+            // 画像がアップロードされなければ既存のまま
+            unset($data['image_path']);
+        }
+
+        $product->update($data);
+
         return redirect()->route('products.index')->with('success', '商品を更新しました');
     }
 
     public function destroy(string $id)
     {
-        //
+        $user = Auth::user();
+        $product = Product::findOrFail($id);
+
+        // 管理者のみ削除可能
+        if (!$user || !$user->isAdmin()) {
+            abort(403);
+        }
+
+        $product->delete(); // 論理削除
+
+        return redirect()->route('products.index')->with('success', '商品を削除しました。');
     }
 }

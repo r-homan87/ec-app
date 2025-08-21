@@ -13,6 +13,9 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
     use SoftDeletes;
 
+    const ROLE_USER = 'user';
+    const ROLE_ADMIN = 'admin';
+
     protected $fillable = [
         'last_name',
         'first_name',
@@ -24,6 +27,7 @@ class User extends Authenticatable
         'phone_number',
         'password',
         'status',
+        'role',
     ];
 
     protected $hidden = [
@@ -37,6 +41,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === self::ROLE_ADMIN;
     }
 
     public function getStatusLabelAttribute()

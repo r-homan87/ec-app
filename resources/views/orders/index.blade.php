@@ -8,7 +8,6 @@
     <div class="py-8 px-4">
         @forelse ($orders as $order)
         <div class="mb-6 border p-4 rounded shadow">
-            <p><strong>注文番号:</strong> {{ $order->id }}</p>
             <p><strong>注文日:</strong> {{ $order->created_at->format('Y/m/d') }}</p>
             <p><strong>合計金額:</strong> ¥{{ number_format($order->total_price) }}</p>
             <a href="{{ route('orders.show', $order) }}" class="text-blue-500 hover:underline">詳細を見る</a>

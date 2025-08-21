@@ -29,6 +29,7 @@
                 <tbody>
                     @php $total = 0; @endphp
                     @foreach ($cartItems as $item)
+                    @if ($item->product) {{-- 商品が存在する場合のみ表示 --}}
                     @php
                     $subtotal = $item->product->price * $item->quantity;
                     $total += $subtotal;
@@ -40,8 +41,7 @@
                             <form action="{{ route('cart.update', $item) }}" method="POST" class="flex items-center space-x-2">
                                 @csrf
                                 @method('PATCH')
-                                <input type="number" name="quantity" value="{{ $item->quantity }}" min="1"
-                                    class="w-16 border rounded text-center" />
+                                <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" max="{{ $item->product->stock }}" class="w-16 border rounded text-center" />
                                 <button type="submit" class="text-blue-600 hover:underline text-sm">変更</button>
                             </form>
                         </td>
@@ -54,11 +54,8 @@
                             </form>
                         </td>
                     </tr>
+                    @endif
                     @endforeach
-                    <tr class="font-bold bg-gray-100">
-                        <td colspan="3" class="text-right px-4 py-2">合計</td>
-                        <td class="px-4 py-2">¥{{ number_format($total) }}</td>
-                    </tr>
                 </tbody>
             </table>
             @endif

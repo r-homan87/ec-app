@@ -7,6 +7,11 @@
         $recipient = $data['recipient_name'] ?? '';
         $postalCode = $data['postal_code'] ?? '';
         $address = $data['address'] ?? '';
+        $shippingFee = 800;
+        $subtotal = $cartItems->reduce(function ($carry, $item) {
+        return $carry + ($item->product ? $item->product->price * $item->quantity : 0);
+        }, 0);
+        $total = $subtotal + $shippingFee;
         @endphp
 
         {{-- カート内容 --}}
@@ -22,22 +27,18 @@
                 </thead>
                 <tbody>
                     @foreach ($cartItems as $item)
+                    @if ($item->product)
                     <tr>
                         <td class="border px-4 py-2">{{ $item->product->name }}</td>
-                        <td class="border px-4 py-2">{{ number_format($item->product->price) }}</td>
-                        <td class="border px-4 py-2">{{ $item->quantity }}</td>
-                        <td class="border px-4 py-2">{{ number_format($item->product->price * $item->quantity) }}</td>
+                        <td class="border px-4 py-2 text-right">¥{{ number_format($item->product->price) }}</td>
+                        <td class="border px-4 py-2 text-right">{{ $item->quantity }}</td>
+                        <td class="border px-4 py-2 text-right">¥{{ number_format($item->product->price * $item->quantity) }}</td>
                     </tr>
+                    @endif
                     @endforeach
                 </tbody>
             </table>
         </div>
-
-        @php
-        $shippingFee = 800;
-        $subtotal = $cartItems->sum(fn($item) => $item->product->price * $item->quantity);
-        $total = $subtotal + $shippingFee;
-        @endphp
 
         {{-- 金額 --}}
         <div class="mt-4 text-right space-y-1">
@@ -64,8 +65,8 @@
             </div>
         </div>
 
-        {{-- ボタン --}}
-        <form method="POST" action="{{ route('orders.store') }}">
+        {{-- 注文確定ボタン --}}
+        <form method="POST" action="{{ route('orders.store') }}" class="mt-6">
             @csrf
             @foreach ($data as $key => $value)
             <input type="hidden" name="{{ $key }}" value="{{ $value }}">

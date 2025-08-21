@@ -14,10 +14,19 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 
 Route::get('/', [TopController::class, 'index'])->name('top');
 
-Route::get('/dashboard', fn() => view('dashboard'))
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+// ========================
+// 公開ページ
+// ========================
+Route::get('/about', fn() => view('about'))->name('about');
 
+// ========================
+// 商品一覧（公開用）
+// ========================
+Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+
+// ========================
+// 認証必須ルート
+// ========================
 Route::middleware('auth')->group(function () {
     // ========================
     // マイページ
@@ -28,6 +37,7 @@ Route::middleware('auth')->group(function () {
     // 配送先
     // ========================
     Route::get('/shipping_addresses', [ShippingAddressController::class, 'index'])->name('shipping_addresses.index');
+    Route::post('/shipping_addresses', [ShippingAddressController::class, 'store'])->name('shipping_addresses.store');
     Route::get('/shipping_addresses/{id}/edit', [ShippingAddressController::class, 'edit'])->name('shipping_addresses.edit');
     Route::put('/shipping_addresses/{id}', [ShippingAddressController::class, 'update'])->name('shipping_addresses.update');
     Route::delete('/shipping_addresses/{id}', [ShippingAddressController::class, 'destroy'])->name('shipping_addresses.destroy');
@@ -35,11 +45,16 @@ Route::middleware('auth')->group(function () {
     // ========================
     // 管理画面（admin prefix）
     // ========================
-    Route::prefix('admin')->name('admin.')->group(function () {
-        Route::resource('users', UserController::class);
-        Route::get('/users/{user}/orders', [AdminOrderController::class, 'index'])->name('users.orders.index');
-        Route::get('orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
-    });
+    Route::prefix('admin')
+        ->name('admin.')
+        ->middleware('admin')
+        ->group(function () {
+            Route::resource('users', UserController::class);
+            Route::get('/users/{user}/orders', [AdminOrderController::class, 'index'])->name('users.orders.index');
+            Route::get('orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
+            Route::patch('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.updateStatus');
+            Route::patch('/order-items/{orderItem}/status', [AdminOrderController::class, 'updateOrderItemStatus'])->name('orderItems.updateStatus');
+        });
 
     // ========================
     // プロフィール
@@ -51,9 +66,14 @@ Route::middleware('auth')->group(function () {
     });
 
     // ========================
-    // 商品
+    // 商品（認証必須の操作）
     // ========================
-    Route::resource('products', ProductController::class);
+    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
+    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+    Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
+    Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
+    Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
     // ========================
     // カート
@@ -84,9 +104,6 @@ Route::middleware('auth')->group(function () {
 });
 
 // ========================
-// 公開ページ
-// ========================
-Route::get('/about', fn() => view('about'))->name('about');
-
 // 認証関連（Laravel Breeze等）
+// ========================
 require __DIR__ . '/auth.php';

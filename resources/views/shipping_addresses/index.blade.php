@@ -3,13 +3,25 @@
         <h1 class="text-2xl font-bold mb-6">配送先一覧</h1>
 
         {{-- 新規登録フォーム --}}
-        <form action="{{ route('orders.confirm') }}" method="POST">
+        <form action="{{ route('shipping_addresses.store') }}" method="POST">
             @csrf
+
+            {{-- バリデーションエラー --}}
+            @if ($errors->any())
+            <div class="mb-4 p-4 bg-red-100 text-red-700 border border-red-400 rounded">
+                <ul class="list-disc pl-5">
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
+
             <div class="mb-6">
                 <div class="mt-2 space-y-2">
-                    <input type="text" name="new_postal_code" placeholder="郵便番号（ハイフンなし）" class="w-full border p-2 rounded">
-                    <input type="text" name="new_address" placeholder="住所" class="w-full border p-2 rounded">
-                    <input type="text" name="new_recipient_name" placeholder="宛名" class="w-full border p-2 rounded">
+                    <input type="text" name="postal_code" placeholder="郵便番号（ハイフンなし）" class="w-full border p-2 rounded" value="{{ old('postal_code') }}">
+                    <input type="text" name="address" placeholder="住所" class="w-full border p-2 rounded" value="{{ old('address') }}">
+                    <input type="text" name="recipient_name" placeholder="宛名" class="w-full border p-2 rounded" value="{{ old('recipient_name') }}">
                 </div>
                 <div class="text-right mt-2">
                     <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
